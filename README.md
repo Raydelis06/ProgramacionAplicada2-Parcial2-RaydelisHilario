@@ -7,6 +7,8 @@ Raydelis Anabel Hilario Méndez
 Programacion Aplicada 2
 ## Descripcion
 Este repositorio abarca el segundo parcial del curso.
+### Nota
+La carpeta de backend la habia agregado por prevencion. Pero ya que se nos proporciono la api, solo tiene el proyecto inicializado, limpio.
 ## Tecnologias utilizadas
 - Javascript
 - Typescript
