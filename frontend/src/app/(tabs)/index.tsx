@@ -35,19 +35,19 @@ export default function Catalogo() {
         <TouchableOpacity style={styles.button} onPress={salir}><Text style={styles.buttonText}>Cerrar sesión</Text></TouchableOpacity>
       </View>
 
-      <Pressable onPress={() => setSoloDisponibles(!soloDisponibles)}>
+      <TouchableOpacity onPress={() => setSoloDisponibles(!soloDisponibles)}>
         <Text style={styles.link}>{soloDisponibles ? 'Solo disponibles (tocar para ver todos)' : 'Ver solo disponibles'}</Text>
-      </Pressable>
+      </TouchableOpacity>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       {vehiculos.map((vehiculo) => (
-        <Pressable key={vehiculo.id} style={styles.card} onPress={() => router.push(`/vehiculo/${vehiculo.id}`)}>
+        <TouchableOpacity key={vehiculo.id} style={styles.card} onPress={() => router.push(`/vehiculo/${vehiculo.id}`)}>
           <Text style={styles.cardTitle}>{vehiculo.marca} {vehiculo.modelo}</Text>
           <Text style={styles.cardDesc}>Año: {vehiculo.anio}</Text>
           <Text style={styles.cardDesc}>Precio: US$ {Number(vehiculo.precio).toLocaleString()}</Text>
           <Text style={styles.cardDesc}>Estado: {vehiculo.estado}</Text>
-        </Pressable>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );
