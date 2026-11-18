@@ -1,5 +1,5 @@
 import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedIcon } from '@/components/animated-icon';
@@ -8,6 +8,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useState } from 'react';
+import { useRouter } from 'expo-router';
+import { login } from '@/services/api';
 
 function getDevMenuHint() {
   if (Platform.OS === 'web') {
@@ -29,32 +32,91 @@ function getDevMenuHint() {
 }
 
 export default function HomeScreen() {
+  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const handleIniciarSesion = async () => {
+    if (!email.trim() || !password) {
+      setError("Escribe tu email y contraseña.");
+      return;
+    }
+
+    setCargando(true);
+    setError("");
+    try {
+      await login(email.trim(), password);
+      console.log("Ha iniciado sesion correctamente");
+      router.replace("/(tabs)");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "No se pudo iniciar sesión.",
+      );
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const irRegistro = () => {
+    router.push("/registro");
+  };
+
   return (
+    
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
           <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
+            VICECITY
           </ThemedText>
         </ThemedView>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
+        <ThemedText type="subtitle" style={styles.code}>
+          Login
         </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
+        <ThemedText type="default" style={styles.code}>
+          Email
+        </ThemedText>
+        <TextInput
+          placeholder="ejemplo@email.com"
+          placeholderTextColor="gray"
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+        <ThemedText type="default" style={styles.code}>
+          Constraseña
+        </ThemedText>
+        <TextInput
+          placeholder="tuContraseña"
+          placeholderTextColor="gray"
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        {error ? <ThemedText style={{color:'red'}}>{error}</ThemedText> : null}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleIniciarSesion}
+          disabled={cargando}
+        >
+          <ThemedText>
+            {cargando ? (
+              <ActivityIndicator />
+            ) : (
+              <ThemedText>Iniciar sesión</ThemedText>
+            )}
+          </ThemedText>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={irRegistro}>
+          <ThemedText type='code'>No tienes una cuenta? Regístrate</ThemedText>
+        </TouchableOpacity>
         {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
     </ThemedView>
@@ -94,5 +156,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
+  },
+  input:{
+    height: 46,
+    borderWidth: 1,
+    borderColor: "#ffffff8d",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+    width:300,
+    color:'white'
+  },
+  button: {
+    marginTop: 8,
+    backgroundColor: 'gray',
+    height: 46,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12
   },
 });
